@@ -186,7 +186,6 @@
 
 .button-book {
     margin: -10px;
-    padding: 0px;
 }
 
 .button-chap {
