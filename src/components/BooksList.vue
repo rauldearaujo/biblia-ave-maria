@@ -1,8 +1,10 @@
 <template>
 <div>
-    <b-navbar toggleable="lg" type="dark" variant="dark">
-        <b-navbar-brand href="#"><i class="fas fa-bible"></i> Bíblia Ave-Maria</b-navbar-brand>
-
+    <b-navbar fixed="top" sticky  toggleable="lg" type="dark" variant="dark">
+        <b-navbar-brand href="#" @click="voltarParaLivros()"><i class="fas fa-bible"></i> Bíblia Ave-Maria</b-navbar-brand>
+        <b-button class="ml-auto" v-if="existemVersiculosSelecionados()" @click="copiarTexto()" squared size="md" type="submit" variant="outline-light">
+            <i class="fas fa-copy"></i> Copiar
+        </b-button>
         <!-- <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav class="ml-auto">
                 <b-nav-form>
@@ -14,7 +16,7 @@
     </b-navbar>
 
     <b-container class="mx-auto">
-        <div v-if="livros && !capitulos && !texto" class="text-left">
+        <div v-if="livros && !capitulos && !versiculos" class="text-left">
             <br/>
             <b-row class="books-list">
                 <b-col>
@@ -50,7 +52,7 @@
             </b-row>
         </div>
 
-        <div v-if="livros && capitulos && !texto" class="text-left">
+        <div v-if="livros && capitulos && !versiculos" class="text-left">
             <br/>
             <b-button 
                 squared variant="dark" 
@@ -75,7 +77,7 @@
             </b-row>
         </div>
 
-        <div v-if="livros && capitulos && texto" class="text-left">
+        <div v-if="livros && capitulos && versiculos" class="text-left">
             <br/>
             <b-button squared 
                 variant="dark" 
@@ -144,9 +146,10 @@
                         </vue-content-loading>
                     </div>
                     <div v-else>
-                        <p class="texto" v-for="(versiculo, index) in texto" :key="index">
-                            {{versiculo}}
-                        </p>
+                        
+                        <div :ref="`v-${index}`" @click="toggleSelecionarVersiculo(index)" class="texto" v-for="(versiculo, index) in versiculos" :key="index">
+                            <p :class="[versiculosSelecionados[index] ? 'versiculoSelecionado' : '']">{{versiculo}}</p>
+                        </div>
                         <br/>
                         <b-button squared 
                                     variant="dark"
@@ -203,6 +206,10 @@
 
 .selected-button {
     background-color: black;
+}
+
+.versiculoSelecionado {
+    background-color: #ffdd55;
 }
 </style>
 
@@ -287,8 +294,31 @@ export default {
             };
 
             let res = await axios(requestConfig);
-            this.texto = res.data.slice(1);
+            this.versiculos = res.data.slice(1);
+            this.versiculosSelecionados = this.versiculos.map(() => {return false});
             this.loadingTexto = false;
+        },
+
+        toggleSelecionarVersiculo: function(indiceVersiculo) {
+            this.$set(this.versiculosSelecionados, indiceVersiculo, !this.versiculosSelecionados[indiceVersiculo]);
+        },
+
+        existemVersiculosSelecionados: function() {
+            if(this.versiculosSelecionados !== undefined) {
+                return this.versiculosSelecionados.some((item) => {return item});
+            }
+            return false;
+        },
+
+        copiarTexto: async function() {
+            let texto = '';
+            for(let i = 0; i<this.versiculos.length; i++) {
+                if(this.versiculosSelecionados[i]) {
+                    texto = texto.concat(this.versiculos[i]);
+                }
+            }
+            texto = texto.concat(`\n\n${this.livroSelecionado.slice(3)} ${this.formatChapterNumber(this.capituloSelecionado)}`);
+            await navigator.clipboard.writeText(texto);
         },
 
         chapterNumber2String: function(chapterInt) {
@@ -338,11 +368,13 @@ export default {
             this.capitulos = undefined;
             this.livroSelecionado = undefined;
             this.testamentoSelecionado = undefined;
-            this.texto = undefined;
+            this.versiculosSelecionados = undefined
+            this.versiculos = undefined;
         },
 
         voltarParaCapitulos: function() {
-            this.texto = undefined;
+            this.versiculos = undefined;
+            this.versiculosSelecionados = undefined;
             this.capituloSelecionado = undefined;
         }
     },
@@ -360,7 +392,8 @@ export default {
             testamentoSelecionado: undefined,
             capitulos: undefined,
             capituloSelecionado: undefined,
-            texto: undefined,
+            versiculos: undefined,
+            versiculosSelecionados: undefined,
             loadingTexto: false
         }
     }
