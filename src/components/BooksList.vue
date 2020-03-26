@@ -15,14 +15,13 @@
         </b-collapse> -->
     </b-navbar>
 
-    <b-container class="mx-auto">
+    <b-container>
         <div v-if="livros && !capitulos && !versiculos" class="text-left">
-            <br/>
-            <b-row class="books-list">
-                <b-col>
+            <b-row>
+                <b-col class="books-list">
                     <h4>Antigo Testamento</h4>
-                    <b-row>
-                        <b-col lg="6" md="12" v-for="(nomeLivro, index) in livros.AT" :key="nomeLivro">
+                    <ul class="list-unstyled book-columns">
+                        <li v-for="(nomeLivro, index) in livros.AT" :key="nomeLivro">
                             <b-button squared
                                 variant="link" 
                                 class="button-book text-left text-dark" 
@@ -31,13 +30,13 @@
                             >
                                 {{nomeLivro}}
                             </b-button>
-                        </b-col>
-                    </b-row>
+                        </li>
+                    </ul>
                 </b-col>
-                <b-col>
+                <b-col class="books-list">
                     <h4>Novo Testamento</h4>
-                    <b-row>
-                        <b-col lg="6" md="12" v-for="(nomeLivro, index) in livros.NT" :key="nomeLivro" class="text-left">
+                    <ul class="list-unstyled book-columns">
+                        <li v-for="(nomeLivro, index) in livros.NT" :key="nomeLivro">
                             <b-button squared
                                 variant="link" 
                                 class="button-book text-left text-dark" 
@@ -46,8 +45,8 @@
                             >
                                 {{nomeLivro}}
                             </b-button>
-                        </b-col>
-                    </b-row>
+                        </li>
+                    </ul>
                 </b-col>
             </b-row>
         </div>
@@ -58,7 +57,7 @@
                 squared variant="dark" 
                 class="back-button"
                 @click="voltarParaLivros()">
-                    <i class="fas fa-long-arrow-alt-left"></i> Voltar
+                    <i class="fas fa-long-arrow-alt-left"></i><span class="d-none d-sm-block d-sm-none d-md-block float-right ml-2">Voltar</span>
             </b-button> 
             <h3>
                 {{livroSelecionado.slice(3)}}
@@ -83,7 +82,7 @@
                 variant="dark" 
                 class="back-button"
                 @click="voltarParaCapitulos()">
-                    <i class="fas fa-long-arrow-alt-left"></i> Voltar
+                    <i class="fas fa-long-arrow-alt-left"></i><span class="d-none d-sm-block d-sm-none d-md-block float-right ml-2">Voltar</span>
             </b-button> 
             
             <b-row>
@@ -123,13 +122,13 @@
                                     variant="dark"
                                     :disabled="capituloSelecionado === '01'"
                                     @click="abrirCapitulo(parseInt(capituloSelecionado) - 1)">
-                                        <i class="fas fa-arrow-left"></i> Anterior
+                                        <i class="fas fa-arrow-left"></i> <span class="d-none d-sm-block d-sm-none d-md-block float-right ml-2">Anterior</span>
                                 </b-button>
                                 <b-button squared
                                     variant="dark"
                                     :disabled="capituloSelecionado === capitulos[capitulos.length-1]"
                                     @click="abrirCapitulo(parseInt(capituloSelecionado) + 1)">
-                                        Próximo <i class="fas fa-arrow-right"></i>
+                                    <span class="d-none d-sm-block d-sm-none d-md-block float-left mr-2">Próximo</span> <i class="fas fa-arrow-right"></i>
                                 </b-button>
                             </b-button-group>
                         </b-col>
@@ -148,29 +147,29 @@
                     <div v-else>
                         
                         <div :ref="`v-${index}`" @click="toggleSelecionarVersiculo(index)" class="texto" v-for="(versiculo, index) in versiculos" :key="index">
-                            <p :class="[versiculosSelecionados[index] ? 'versiculoSelecionado' : '']">{{versiculo}}</p>
+                            <p :class="[versiculosSelecionados[index] ? 'versiculo-selecionado versiculo' : 'versiculo']">{{versiculo}}</p>
                         </div>
                         <br/>
                         <b-button squared 
                                     variant="dark"
                                     :disabled="capituloSelecionado === '01'"
                                     @click="toTop()">
-                                        <i class="fas fa-arrow-up"></i> Topo
+                                        <i class="fas fa-arrow-up"></i> <span class="d-none d-sm-block d-sm-none d-md-block float-right ml-2">Topo</span>
                                 </b-button>
                         <b-button-group style="float:right">
-                                <b-button squared 
-                                    variant="dark"
-                                    :disabled="capituloSelecionado === '01'"
-                                    @click="abrirCapitulo(parseInt(capituloSelecionado) - 1)">
-                                        <i class="fas fa-arrow-left"></i> Anterior
-                                </b-button>
-                                <b-button squared
-                                    variant="dark"
-                                    :disabled="capituloSelecionado === capitulos[capitulos.length-1]"
-                                    @click="abrirCapitulo(parseInt(capituloSelecionado) + 1)">
-                                        Próximo <i class="fas fa-arrow-right"></i>
-                                </b-button>
-                            </b-button-group>
+                            <b-button squared 
+                                variant="dark"
+                                :disabled="capituloSelecionado === '01'"
+                                @click="abrirCapitulo(parseInt(capituloSelecionado) - 1)">
+                                    <i class="fas fa-arrow-left"></i> <span class="d-none d-sm-block d-sm-none d-md-block float-right ml-2">Anterior</span>
+                            </b-button>
+                            <b-button squared
+                                variant="dark"
+                                :disabled="capituloSelecionado === capitulos[capitulos.length-1]"
+                                @click="abrirCapitulo(parseInt(capituloSelecionado) + 1)">
+                                <span class="d-none d-sm-block d-sm-none d-md-block float-left mr-2">Próximo</span> <i class="fas fa-arrow-right"></i>
+                            </b-button>
+                        </b-button-group>
                     </div>
                 </b-col>
             </b-row>
@@ -184,11 +183,16 @@
 
 <style>
 .books-list {
+    margin-top: 20px;
     font-size: 10px;
 }
 
+.book-columns {
+    column-count: 2;
+}
+
 .button-book {
-    margin: -10px;
+    margin: -7px;
 }
 
 .button-chap {
@@ -208,7 +212,12 @@
     background-color: black;
 }
 
-.versiculoSelecionado {
+.versiculo {
+    margin: 0px;
+    cursor: pointer;
+}
+
+.versiculo-selecionado {
     background-color: #ffdd55;
 }
 </style>
@@ -311,13 +320,19 @@ export default {
         },
 
         copiarTexto: async function() {
-            let texto = '';
+            let texto = '"';
             for(let i = 0; i<this.versiculos.length; i++) {
                 if(this.versiculosSelecionados[i]) {
                     texto = texto.concat(this.versiculos[i]);
                 }
             }
-            texto = texto.concat(`\n\n${this.livroSelecionado.slice(3)} ${this.formatChapterNumber(this.capituloSelecionado)}`);
+            // cleaning text
+            texto = texto.replace(/\n+|[0-9]+\.|\r+|\t+|\s+/g, " ");
+            texto = texto.replace(/\s+/g, " ");
+            texto = texto.replace(/(\s$)|("\s)/g, "\"");
+            
+            texto = texto.concat(`\n\n(${this.livroSelecionado.slice(3)} ${this.formatChapterNumber(this.capituloSelecionado)})`);
+            
             await navigator.clipboard.writeText(texto);
         },
 
