@@ -146,7 +146,7 @@
                     </div>
                     <div v-else>
                         
-                        <div :ref="`v-${index}`" @click="toggleSelecionarVersiculo(index)" class="texto" v-for="(versiculo, index) in versiculos" :key="index">
+                        <div @click="toggleSelecionarVersiculo(index)" class="texto" v-for="(versiculo, index) in versiculos" :key="index">
                             <p :class="[versiculosSelecionados[index] ? 'versiculo-selecionado versiculo' : 'versiculo']">{{versiculo}}</p>
                         </div>
                         <br/>
@@ -304,12 +304,14 @@ export default {
 
             let res = await axios(requestConfig);
             this.versiculos = res.data.slice(1);
+            console.log(this.versiculos);
             this.versiculosSelecionados = this.versiculos.map(() => {return false});
             this.loadingTexto = false;
         },
 
         toggleSelecionarVersiculo: function(indiceVersiculo) {
             this.$set(this.versiculosSelecionados, indiceVersiculo, !this.versiculosSelecionados[indiceVersiculo]);
+            console.log(this.versiculosSelecionados);
         },
 
         existemVersiculosSelecionados: function() {
@@ -331,7 +333,23 @@ export default {
             texto = texto.replace(/\s+/g, " ");
             texto = texto.replace(/(\s$)|("\s)/g, "\"");
             
-            texto = texto.concat(`\n\n(${this.livroSelecionado.slice(3)} ${this.formatChapterNumber(this.capituloSelecionado)})`);
+            // formatando seleção de versiculos
+            let versiculosStr = `${this.versiculosSelecionados.indexOf(true)}`;
+            let last = this.versiculosSelecionados.indexOf(true);
+            console.log(last);
+            console.log(this.versiculosSelecionados);
+            for(let i = last+1; i<this.versiculosSelecionados.length; i++) {
+                if(this.versiculosSelecionados[i] && i-1 === last) {
+                    last = i;
+                }
+                else {
+                    versiculosStr.concat(`-${last+1}; ${i+1}`);
+                    last = i;
+                }
+            }
+
+
+            texto = texto.concat(`\n\n(${this.livroSelecionado.slice(3)} ${this.formatChapterNumber(this.capituloSelecionado)}, ${versiculosStr})`);
             
             await navigator.clipboard.writeText(texto);
         },
