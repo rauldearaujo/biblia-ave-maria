@@ -334,18 +334,27 @@ export default {
             texto = texto.replace(/(\s$)|("\s)/g, "\"");
             
             // formatando seleção de versiculos
-            let versiculosStr = `${this.versiculosSelecionados.indexOf(true)}`;
-            let last = this.versiculosSelecionados.indexOf(true);
-            console.log(last);
-            console.log(this.versiculosSelecionados);
+            let versiculosStr = `${this.versiculosSelecionados.indexOf(true)+1}`;
+            let first = this.versiculosSelecionados.indexOf(true); 
+            let last = first;
+            
             for(let i = last+1; i<this.versiculosSelecionados.length; i++) {
-                if(this.versiculosSelecionados[i] && i-1 === last) {
-                    last = i;
+                if(this.versiculosSelecionados[i]) {
+                    if(i-1 === last) {
+                        last = i;
+                    }
+                    else {
+                        if(last !== first) {
+                            versiculosStr = versiculosStr.concat(`-${last+1}`);
+                        }
+                        first = i;    
+                        versiculosStr = versiculosStr.concat(`.${first+1}`);    
+                        last = first;
+                    }
                 }
-                else {
-                    versiculosStr.concat(`-${last+1}; ${i+1}`);
-                    last = i;
-                }
+            }
+            if(last !== first) {
+                versiculosStr = versiculosStr.concat(`-${last+1}`);
             }
 
 
