@@ -16,8 +16,22 @@
     </b-navbar>
 
     <b-container>
-        <div v-if="livros && !capitulos && !versiculos" class="text-left">
-            <b-row>
+        
+        <div v-if="livros && !capitulos && !versiculos" class="text-left books-list-background">
+            
+            <div v-if="livroSelecionado">
+                <br/>
+                <vue-content-loading v-bind="$attrs" dark="#e0e0e0" secondary="#d0d0d0" :width="300" :height="120">
+                    <rect x="0" y="0" rx="3" ry="3" width="250" height="10" />
+                    <rect x="20" y="20" rx="3" ry="3" width="220" height="10" />
+                    <rect x="20" y="40" rx="3" ry="3" width="170" height="10" />
+                    <rect x="0" y="60" rx="3" ry="3" width="250" height="10" />
+                    <rect x="20" y="80" rx="3" ry="3" width="200" height="10" />
+                    <rect x="20" y="100" rx="3" ry="3" width="80" height="10" />
+                </vue-content-loading>
+            </div>
+
+            <b-row v-else>
                 <b-col class="books-list">
                     <h4>Antigo Testamento</h4>
                     <ul class="list-unstyled book-columns">
@@ -50,30 +64,57 @@
                 </b-col>
             </b-row>
         </div>
+        
+        <div v-if="!livros">
+            <br/>
+            <vue-content-loading v-bind="$attrs" dark="#e0e0e0" secondary="#d0d0d0" :width="300" :height="120">
+                <rect x="0" y="0" rx="3" ry="3" width="250" height="10" />
+                <rect x="20" y="20" rx="3" ry="3" width="220" height="10" />
+                <rect x="20" y="40" rx="3" ry="3" width="170" height="10" />
+                <rect x="0" y="60" rx="3" ry="3" width="250" height="10" />
+                <rect x="20" y="80" rx="3" ry="3" width="200" height="10" />
+                <rect x="20" y="100" rx="3" ry="3" width="80" height="10" />
+            </vue-content-loading>
+        </div>
 
         <div v-if="livros && capitulos && !versiculos" class="text-left">
-            <br/>
-            <b-button 
-                squared variant="dark" 
-                class="back-button"
-                @click="voltarParaLivros()">
-                    <i class="fas fa-long-arrow-alt-left"></i><span class="d-none d-sm-block d-sm-none d-md-block float-right ml-2">Voltar</span>
-            </b-button> 
-            <h3>
-                {{livroSelecionado.slice(3)}}
-            </h3>
-            <b-row>
-                <div v-for="capitulo in capitulos" :key="capitulo" >
-                    <b-button squared
-                        variant="link" 
-                        class="button-chap text-dark" 
-                        size="lg"
-                        @click="abrirCapitulo(capitulo)"
-                    >
-                        {{capitulo}}
-                    </b-button>
-                </div>
-            </b-row>
+            
+            <div v-if="capituloSelecionado">
+                <br/>
+                <vue-content-loading v-bind="$attrs" dark="#e0e0e0" secondary="#d0d0d0" :width="300" :height="120">
+                    <rect x="0" y="0" rx="3" ry="3" width="250" height="10" />
+                    <rect x="20" y="20" rx="3" ry="3" width="220" height="10" />
+                    <rect x="20" y="40" rx="3" ry="3" width="170" height="10" />
+                    <rect x="0" y="60" rx="3" ry="3" width="250" height="10" />
+                    <rect x="20" y="80" rx="3" ry="3" width="200" height="10" />
+                    <rect x="20" y="100" rx="3" ry="3" width="80" height="10" />
+                </vue-content-loading>
+            </div>
+
+            <div v-else>
+                <br/>
+                <b-button 
+                    squared variant="dark" 
+                    class="back-button"
+                    @click="voltarParaLivros()">
+                        <i class="fas fa-long-arrow-alt-left"></i><span class="d-none d-sm-block d-sm-none d-md-block float-right ml-2">Voltar</span>
+                </b-button> 
+                <h3>
+                    {{livroSelecionado.slice(3)}}
+                </h3>
+                <b-row>
+                    <div v-for="capitulo in capitulos" :key="capitulo" >
+                        <b-button squared
+                            variant="link" 
+                            class="button-chap text-dark" 
+                            size="lg"
+                            @click="abrirCapitulo(capitulo)"
+                        >
+                            {{capitulo}}
+                        </b-button>
+                    </div>
+                </b-row>
+            </div>
         </div>
 
         <div v-if="livros && capitulos && versiculos" class="text-left">
@@ -247,7 +288,7 @@ export default {
 
     methods: {
         abrirLivro: async function(testamento, index, nomeLivro) {
-            
+            this.loadingCapitulos = true;
             this.testamentoSelecionado = testamento;
             
             // computar nome do livro com seu número identificador
@@ -278,6 +319,7 @@ export default {
 
             let res = await axios(requestConfig);
             this.capitulos = res.data;
+            this.loadingCapitulos = false;
         },
 
         abrirCapitulo: async function(capitulo) {
@@ -435,8 +477,7 @@ export default {
             capitulos: undefined,
             capituloSelecionado: undefined,
             versiculos: undefined,
-            versiculosSelecionados: undefined,
-            loadingTexto: false
+            versiculosSelecionados: undefined
         }
     }
 
