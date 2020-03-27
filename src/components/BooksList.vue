@@ -2,8 +2,8 @@
 <div>
     <b-navbar fixed="top" sticky  toggleable="lg" type="dark" variant="dark">
         <b-navbar-brand href="#" @click="voltarParaLivros()"><i class="fas fa-bible"></i> Bíblia Ave-Maria</b-navbar-brand>
-        <b-button class="ml-auto" v-if="existemVersiculosSelecionados()" @click="copiarTexto()" squared size="md" type="submit" variant="outline-light">
-            <i class="fas fa-copy"></i> Copiar
+        <b-button class="ml-auto" v-if="existemVersiculosSelecionados()" @click="copiarTexto()" squared size="md" type="submit" variant="warning">
+            <i :class="btCopiarIcone"></i><span class="d-none d-sm-block d-sm-none d-md-block float-right ml-2">{{btCopiarTexto}}</span>
         </b-button>
         <!-- <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav class="ml-auto">
@@ -259,7 +259,7 @@
 }
 
 .versiculo-selecionado {
-    background-color: #ffdd55;
+    background-color: var(--warning);
 }
 </style>
 
@@ -346,14 +346,14 @@ export default {
 
             let res = await axios(requestConfig);
             this.versiculos = res.data.slice(1);
-            console.log(this.versiculos);
             this.versiculosSelecionados = this.versiculos.map(() => {return false});
             this.loadingTexto = false;
         },
 
         toggleSelecionarVersiculo: function(indiceVersiculo) {
             this.$set(this.versiculosSelecionados, indiceVersiculo, !this.versiculosSelecionados[indiceVersiculo]);
-            console.log(this.versiculosSelecionados);
+            this.btCopiarIcone = "fas fa-copy";
+            this.btCopiarTexto = "Copiar";
         },
 
         existemVersiculosSelecionados: function() {
@@ -364,7 +364,7 @@ export default {
         },
 
         copiarTexto: async function() {
-            let texto = '"';
+            let texto = '';
             for(let i = 0; i<this.versiculos.length; i++) {
                 if(this.versiculosSelecionados[i]) {
                     texto = texto.concat(this.versiculos[i]);
@@ -373,8 +373,19 @@ export default {
             // cleaning text
             texto = texto.replace(/\n+|[0-9]+\.|\r+|\t+|\s+/g, " ");
             texto = texto.replace(/\s+/g, " ");
-            texto = texto.replace(/(\s$)|("\s)/g, "\"");
+            texto = texto.trim();
+
+            let versiculosStr = this.computarSelecaoVersiculosFormatada();            
+
+            texto = `"${texto}"\n\n(${this.livroSelecionado.slice(3)} ${this.formatChapterNumber(this.capituloSelecionado)}, ${versiculosStr})`;
             
+            await navigator.clipboard.writeText(texto);
+
+            this.btCopiarIcone = "fas fa-check";
+            this.btCopiarTexto = "Copiado!";
+        },
+
+        computarSelecaoVersiculosFormatada: function() {
             // formatando seleção de versiculos
             let versiculosStr = `${this.versiculosSelecionados.indexOf(true)+1}`;
             let first = this.versiculosSelecionados.indexOf(true); 
@@ -398,11 +409,7 @@ export default {
             if(last !== first) {
                 versiculosStr = versiculosStr.concat(`-${last+1}`);
             }
-
-
-            texto = texto.concat(`\n\n(${this.livroSelecionado.slice(3)} ${this.formatChapterNumber(this.capituloSelecionado)}, ${versiculosStr})`);
-            
-            await navigator.clipboard.writeText(texto);
+            return versiculosStr;
         },
 
         chapterNumber2String: function(chapterInt) {
@@ -477,7 +484,9 @@ export default {
             capitulos: undefined,
             capituloSelecionado: undefined,
             versiculos: undefined,
-            versiculosSelecionados: undefined
+            versiculosSelecionados: undefined,
+            btCopiarTexto: "Copiar",
+            btCopiarIcone: "fas fa-copy"
         }
     }
 
